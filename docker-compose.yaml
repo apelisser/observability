@@ -1,3 +1,5 @@
+name: observability
+
 services:
   grafana-lgtm:
     image: 'grafana/otel-lgtm:0.22.1'
@@ -5,6 +7,3 @@ services:
       - '3000:3000'
       - '4317:4317'
       - '4318:4318'
-    volumes:
-      - ./grafana/provisioning/dashboards/dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/dashboards.yaml
-      - ./grafana/dashboards:/otel-lgtm/dashboards
