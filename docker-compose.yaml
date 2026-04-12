@@ -7,3 +7,24 @@ services:
       - '3000:3000'
       - '4317:4317'
       - '4318:4318'
+
+  product-service:
+    build:
+      context: microservices/product
+      dockerfile: Dockerfile
+    image: product-service:local
+    container_name: product-service
+    ports:
+      - "8081:8081"
+    environment:
+      # OTEL references:
+      # - https://opentelemetry.io/docs/zero-code/java/agent/getting-started/
+      # - https://opentelemetry.io/docs/languages/java/configuration/
+      JAVA_TOOL_OPTIONS: -javaagent:/opt/otel/opentelemetry-javaagent.jar
+      OTEL_SERVICE_NAME: product-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://grafana-lgtm:4318
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+    depends_on:
+      - grafana-lgtm
