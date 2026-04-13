@@ -1,4 +1,4 @@
-FROM eclipse-temurin:25-jdk AS builder
+FROM eclipse-temurin:17-jdk-noble AS builder
 
 WORKDIR /build
 
@@ -9,7 +9,7 @@ RUN ./mvnw dependency:go-offline -q
 COPY src/ src/
 RUN ./mvnw clean package -q -DskipTests
 
-FROM eclipse-temurin:25-jre AS runtime
+FROM eclipse-temurin:17-jre-noble AS runtime
 
 WORKDIR /app
 
