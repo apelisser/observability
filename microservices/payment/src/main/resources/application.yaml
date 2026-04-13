@@ -9,3 +9,16 @@ spring.application.name: payment-service
 # Por exemplo, 70 simula uma taxa de sucesso de 70%.
 # Obs: o valor é calculado aleatoriamente antes de cada pagamento.
 payment.success.rate: ${PAYMENT_SUCCESS_RATE:99}
+
+otel:
+  service.name: payment-service
+  exporter.otlp.endpoint: http://localhost:4318
+
+# Configuração de logging para adicionar os IDs de rastreamento e span nos logs.
+# Isso é útil para correlacionar os logs em diferentes serviços.
+# Obs: essa configuração não é definida no arquivo de configuração padrão do Spring
+#      (spring-boot-starter-logging), mas sim no arquivo de configuração padrão do
+#      Micrometer (micrometer-core). O Micrometer é uma biblioteca que suporta
+#      métricas, rastreamento e registro em log de aplicações Java.
+#      (https://micrometer.io/)
+logging.pattern.correlation: '[%32X{trace_id}-%16X{span_id}] '
