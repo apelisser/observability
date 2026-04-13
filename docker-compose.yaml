@@ -28,3 +28,20 @@ services:
       OTEL_LOGS_EXPORTER: otlp
     depends_on:
       - grafana-lgtm
+
+  payment-service:
+    build:
+      context: microservices/payment
+      dockerfile: Dockerfile
+    image: payment-service:local
+    container_name: payment-service
+    ports:
+      - "8082:8082"
+    environment:
+      PAYMENT_SUCCESS_RATE: 70
+      # OTEL references:
+      # - https://opentelemetry.io/docs/zero-code/java/agent/getting-started/
+      # - https://opentelemetry.io/docs/languages/java/configuration/
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://grafana-lgtm:4318
+    depends_on:
+      - grafana-lgtm
