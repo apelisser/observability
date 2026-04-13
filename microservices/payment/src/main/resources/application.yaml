@@ -1,2 +1,11 @@
 server.port: 8082
 spring.application.name: payment-service
+
+# Defina a taxa de sucesso dos pagamentos processados.
+# Valores válidos: 0 a 100.
+# 0 significa que todos os pagamentos falharão.
+# 100 significa que todos os pagamentos serão processados com sucesso.
+# Um valor em (0, 100) simula uma taxa de sucesso aleatória.
+# Por exemplo, 70 simula uma taxa de sucesso de 70%.
+# Obs: o valor é calculado aleatoriamente antes de cada pagamento.
+payment.success.rate: ${PAYMENT_SUCCESS_RATE:99}
