@@ -17,15 +17,8 @@ spring:
     hibernate.ddl-auto: create-drop
     show-sql: true
     defer-datasource-initialization: true  # ← garante que o Hibernate cria as tabelas antes do data.sql
+    open-in-view: false
   sql.init.mode: always
-
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/postgres
-#    username: postgres
-#    password: 123456
-#  jpa:
-#    hibernate.ddl-auto: create-drop
-#    show-sql: true
 
 management:
   tracing.sampling.probability: 1.0
@@ -35,3 +28,7 @@ management:
   opentelemetry:
     tracing.export.otlp.endpoint: http://localhost:4318/v1/traces
     logging.export.otlp.endpoint: http://localhost:4318/v1/logs
+
+microservices:
+  product.url: ${MICROSERVICE_PRODUCT_URL:http://localhost:8081}
+  payment.url: ${MICROSERVICE_PAYMENT_URL:http://localhost:8082}

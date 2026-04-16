@@ -6,12 +6,21 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 public class PaymentResult {
 
     private String paymentId;
     private String status;
     private String message;
+
+    public PaymentResult() {
+    }
+
+    @Builder
+    public PaymentResult(String paymentId, String status, String message) {
+        this.paymentId = paymentId;
+        this.status = status;
+        this.message = message;
+    }
 
     public boolean isSuccess() {
         return "success".equalsIgnoreCase(status);

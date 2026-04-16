@@ -19,7 +19,6 @@ import java.util.UUID;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String productId;
     private Integer quantity;
@@ -28,9 +27,10 @@ public class Order {
     private String paymentId;
 
     @Builder
-    public static Order brandNew(String productId, Integer quantity, BigDecimal unitPrice,
+    public static Order brandNew(UUID id, String productId, Integer quantity, BigDecimal unitPrice,
             String customerId, String paymentId) {
         Order order = new Order();
+        order.setId(id);
         order.setProductId(productId);
         order.setQuantity(quantity);
         order.setUnitPrice(unitPrice);

@@ -9,7 +9,7 @@ import com.apelisser.observability.order.model.OrderInput;
 import com.apelisser.observability.order.model.OrderOutput;
 import com.apelisser.observability.order.model.Payment;
 import com.apelisser.observability.order.model.PaymentResult;
-import com.apelisser.observability.order.model.ProductInventoryStatus;
+import com.apelisser.observability.order.model.ReservationResult;
 import com.apelisser.observability.order.service.NotificationService;
 import com.apelisser.observability.order.service.OrderService;
 import com.apelisser.observability.order.service.PaymentService;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 @Slf4j
@@ -44,13 +45,28 @@ public class CheckoutService {
 
     @Transactional
     public OrderOutput checkout(OrderInput orderInput) {
+        UUID orderId = UUID.randomUUID();
         try {
-            this.checkStockAndReserveProduct(orderInput.getProductId(), orderInput.getQuantity());
-            PaymentResult paymentResult = this.processPayment(orderInput);
+            ReservationResult reservation = productService.reserveStock(orderInput.getProductId(), orderInput.getQuantity());
+            if (!orderInput.getQuantity().equals(reservation.getReservedQuantity())) {
+                log.warn("Product {} is out of stock", orderInput.getProductId());
+                throw new ProductOutOfStockException();
+            }
+
+            PaymentResult payment = processPayment(orderInput);
+
+            if (payment.isSuccess()) {
+                productService.confirmReservation(reservation.getProductId(), reservation.getReservationId());
+            } else {
+                productService.cancelReservation(reservation.getProductId(), reservation.getReservationId());
+                log.warn("Payment failed for order {}", orderId);
+                throw new PaymentFailedException();
+            }
 
             Order newOrder = orderService.save(
                 Order.builder()
-                    .paymentId(paymentResult.getPaymentId())
+                    .id(orderId)
+                    .paymentId(payment.getPaymentId())
                     .quantity(orderInput.getQuantity())
                     .productId(orderInput.getProductId())
                     .unitPrice(orderInput.getUnitPrice())
@@ -60,7 +76,7 @@ public class CheckoutService {
 
             notificationService.notifyAsync(
                 Notification.builder()
-                    .orderId(newOrder.getId().toString())
+                    .orderId(orderId.toString())
                     .customerId(orderInput.getCustomerId())
                     .type("SUCCESS")
                     .message("Payment successful")
@@ -82,16 +98,6 @@ public class CheckoutService {
         }
     }
 
-    private void checkStockAndReserveProduct(String productId, Integer quantity) {
-        ProductInventoryStatus productStatus = productService.checkStock(productId);
-        if (productStatus.isUnavailable()) {
-            log.warn("Product {} is out of stock", productId);
-            throw new ProductOutOfStockException();
-        }
-
-        productService.reserveStock(productId, quantity);
-    }
-
     private PaymentResult processPayment(OrderInput orderInput) {
         BigDecimal totalAmount = orderInput.getUnitPrice().multiply(new BigDecimal(orderInput.getQuantity()));
         Payment paymentInput = Payment.builder()
@@ -101,13 +107,7 @@ public class CheckoutService {
             .paymentMethod(orderInput.getPaymentMethod())
             .build();
 
-        PaymentResult paymentResult = paymentService.processPayment(paymentInput);
-        if (!paymentResult.isSuccess()) {
-            log.warn("Payment failed for order {}", orderInput.getProductId());
-            throw new PaymentFailedException();
-        }
-
-        return paymentResult;
+        return paymentService.processPayment(paymentInput);
     }
 
 }
