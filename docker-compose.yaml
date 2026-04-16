@@ -7,6 +7,34 @@ services:
       - '3000:3000'
       - '4317:4317'
       - '4318:4318'
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  rabbit:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    command: >
+      sh -c "
+        rabbitmq-server &
+        until rabbitmqctl await_startup; do sleep 2; done;
+        rabbitmqctl add_vhost observability;
+        rabbitmqctl set_permissions -p observability admin '.*' '.*' '.*';
+        wait
+      "
 
   product-service:
     build:
@@ -27,7 +55,8 @@ services:
       OTEL_METRICS_EXPORTER: otlp
       OTEL_LOGS_EXPORTER: otlp
     depends_on:
-      - grafana-lgtm
+      grafana-lgtm:
+        condition: service_healthy
 
   payment-service:
     build:
@@ -44,4 +73,19 @@ services:
       # - https://opentelemetry.io/docs/languages/java/configuration/
       OTEL_EXPORTER_OTLP_ENDPOINT: http://grafana-lgtm:4318
     depends_on:
-      - grafana-lgtm
+      grafana-lgtm:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: microservices/notification
+      dockerfile: Dockerfile
+    image: notification-service:local
+    container_name: notification-service
+    environment:
+      SPRING_RABBITMQ_HOST: rabbit
+    depends_on:
+      rabbit:
+        condition: service_healthy
+      grafana-lgtm:
+        condition: service_healthy
