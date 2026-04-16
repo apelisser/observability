@@ -19,6 +19,12 @@ spring:
     defer-datasource-initialization: true  # ← garante que o Hibernate cria as tabelas antes do data.sql
     open-in-view: false
   sql.init.mode: always
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+    virtual-host: observability
 
 management:
   tracing.sampling.probability: 1.0
