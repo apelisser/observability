@@ -11,8 +11,8 @@
 	<groupId>com.apelisser.observability</groupId>
 	<artifactId>notification</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>Notification Service</name>
+	<description>Service for sending notifications</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -28,25 +28,79 @@
 	</scm>
 	<properties>
 		<java.version>25</java.version>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-amqp</artifactId>
-		</dependency>
+        <io.opentelemetry.instrumentation.version>2.26.1</io.opentelemetry.instrumentation.version>
+        <opentelemetry-logback-appender.version>2.26.1-alpha</opentelemetry-logback-appender.version>
+    </properties>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+    <dependencyManagement>
+        <dependencies>
+            <!--
+                Gerencia as versões de todas as libs de instrumentação do OpenTelemetry para Java,
+                garantindo compatibilidade entre elas. Complementa o BOM do Spring Boot, que já gerencia
+                o opentelemetry-sdk e o opentelemetry-exporter-otlp - este BOM cobre as libs de
+                instrumentação (ex: logback-appender) que não estão no BOM do Spring Boot.
+            -->
+            <dependency>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-instrumentation-bom</artifactId>
+                <version>${io.opentelemetry.instrumentation.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-		<dependency>
-			<groupId>org.springframework.amqp</groupId>
-			<artifactId>spring-rabbit-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <!-- AMQP (RabbitMQ) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+        <!-- Actuator: infraestrutura de métricas + endpoints /actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Conecta Micrometer/Observation ao OpenTelemetry (traces automáticos para HTTP, AMQP, etc.) -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-otel</artifactId>
+        </dependency>
+
+        <!-- Exporta traces via OTLP para o Tempo -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-otlp</artifactId>
+        </dependency>
+
+        <!-- Exporta métricas via OTLP para o Prometheus/Mimir -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-otlp</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Intercepta logs do Logback e envia via OTLP para o Loki (com traceId/spanId automático) -->
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-logback-appender-1.0</artifactId>
+            <version>${opentelemetry-logback-appender.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>
