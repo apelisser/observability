@@ -1,7 +1,7 @@
 server.port: 8080
 
 spring:
-  application.name: order
+  application.name: order-service
   threads.virtual.enabled: true
 
 ## H2
@@ -15,8 +15,7 @@ spring:
       path: /h2-console
   jpa:
     hibernate.ddl-auto: create-drop
-    show-sql: true
-    defer-datasource-initialization: true  # ← garante que o Hibernate cria as tabelas antes do data.sql
+    show-sql: false
     open-in-view: false
   sql.init.mode: always
   rabbitmq:
@@ -25,10 +24,13 @@ spring:
     username: admin
     password: admin
     virtual-host: observability
+    # Habilita propagação de trace (traceparent) nos headers das mensagens publicadas no RabbitMQ
+    template.observation-enabled: true
 
 management:
   tracing.sampling.probability: 1.0
-  otlp.metrics.export:
+  otlp:
+    metrics.export:
       url: http://localhost:4318/v1/metrics
       step: 5s
   opentelemetry:
