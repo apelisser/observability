@@ -32,6 +32,7 @@
 
 	<properties>
 		<java.version>17</java.version>
+		<opentelemetry-api.version>1.61.0</opentelemetry-api.version>
 	</properties>
 
 	<dependencies>
@@ -57,7 +58,14 @@
 			<optional>true</optional>
 		</dependency>
 
-		<dependency>
+        <!-- Extending instrumentations with the API-->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+            <version>${opentelemetry-api.version}</version>
+        </dependency>
+
+        <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
