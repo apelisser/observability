@@ -36,21 +36,18 @@ services:
         wait
       "
 
+  # Instrumentado via OpenTelemetry Java Agent (zero-code), sem dependências de observabilidade no projeto
   product-service:
     build:
       context: microservices/product
       dockerfile: Dockerfile
     image: product-service:local
     container_name: product-service
-    ports:
-      - "8081:8081"
     environment:
-      # OTEL references:
-      # - https://opentelemetry.io/docs/zero-code/java/agent/getting-started/
-      # - https://opentelemetry.io/docs/languages/java/configuration/
       JAVA_TOOL_OPTIONS: -javaagent:/opt/otel/opentelemetry-javaagent.jar
       OTEL_SERVICE_NAME: product-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://grafana-lgtm:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
       OTEL_TRACES_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: otlp
       OTEL_LOGS_EXPORTER: otlp
@@ -58,24 +55,22 @@ services:
       grafana-lgtm:
         condition: service_healthy
 
+  # Starter do OpenTelemetry (publicado pelo projeto OTel) para auto-instrumentação de Spring Boot
   payment-service:
     build:
       context: microservices/payment
       dockerfile: Dockerfile
     image: payment-service:local
     container_name: payment-service
-    ports:
-      - "8082:8082"
     environment:
       PAYMENT_SUCCESS_RATE: 70
-      # OTEL references:
-      # - https://opentelemetry.io/docs/zero-code/java/agent/getting-started/
-      # - https://opentelemetry.io/docs/languages/java/configuration/
       OTEL_EXPORTER_OTLP_ENDPOINT: http://grafana-lgtm:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
     depends_on:
       grafana-lgtm:
         condition: service_healthy
 
+  # Observabilidade via Micrometer Tracing com bridge OTel (zero-agent, zero-starter)
   notification-service:
     build:
       context: microservices/notification
@@ -84,8 +79,39 @@ services:
     container_name: notification-service
     environment:
       SPRING_RABBITMQ_HOST: rabbit
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://grafana-lgtm:4318/v1/traces
+      MANAGEMENT_OTLP_LOGGING_ENDPOINT: http://grafana-lgtm:4318/v1/logs
+      MANAGEMENT_OTLP_METRICS_EXPORT_URL: http://grafana-lgtm:4318/v1/metrics
     depends_on:
       rabbit:
         condition: service_healthy
       grafana-lgtm:
         condition: service_healthy
+
+  # Starter nativo do Spring Boot 4.x para OpenTelemetry
+  order-service:
+    build:
+      context: microservices/order
+      dockerfile: Dockerfile
+    image: order-service:local
+    container_name: order-service
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_RABBITMQ_HOST: rabbit
+      OTEL_METRICS_EXPORTER_ENDPOINT: http://grafana-lgtm:4318/v1/metrics
+      OTEL_TRACING_EXPORTER_ENDPOINT: http://grafana-lgtm:4318/v1/traces
+      OTEL_LOGGING_EXPORTER_ENDPOINT: http://grafana-lgtm:4318/v1/logs
+      MICROSERVICE_PRODUCT_URL: http://product-service:8081
+      MICROSERVICE_PAYMENT_URL: http://payment-service:8082
+    depends_on:
+      rabbit:
+        condition: service_healthy
+      grafana-lgtm:
+        condition: service_healthy
+      payment-service:
+        condition: service_started
+      product-service:
+        condition: service_started
+      notification-service:
+        condition: service_started
