@@ -89,6 +89,7 @@ Host-accessible URLs:
 
 To run the full stack, you need:
 
+- Git.
 - Docker Engine with Docker Compose v2.
 - Internet access during the first build, because Docker images and Maven dependencies must be downloaded.
 - Available local ports: `3000`, `4317`, `4318`, `5672`, `15672`, and `8080`.
@@ -99,17 +100,21 @@ You do not need to install Java or Maven locally to run the stack through Docker
 Quick checks:
 
 ```bash
+git --version
 docker --version
 docker compose version
 ```
 
 ## Run The Full Stack
 
-1. Start from the repository root, where `docker-compose.yaml` is located.
+1. Clone the repository if you do not have it locally yet.
 
 ```bash
-pwd
+git clone https://github.com/apelisser/observability.git
+cd observability
 ```
+
+If you already cloned the repository, just start from its root directory.
 
 2. Build and start every service.
 
