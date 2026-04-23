@@ -35,10 +35,10 @@
     <dependencyManagement>
         <dependencies>
             <!--
-                Gerencia as versões de todas as libs de instrumentação do OpenTelemetry para Java,
-                garantindo compatibilidade entre elas. Complementa o BOM do Spring Boot, que já gerencia
-                o opentelemetry-sdk e o opentelemetry-exporter-otlp - este BOM cobre as libs de
-                instrumentação (ex: logback-appender) que não estão no BOM do Spring Boot.
+                Manages the versions of all OpenTelemetry Java instrumentation libraries,
+                ensuring compatibility between them. It complements the Spring Boot BOM, which already manages
+                opentelemetry-sdk and opentelemetry-exporter-otlp; this BOM covers instrumentation libraries
+                (for example, logback-appender) that are not managed by the Spring Boot BOM.
             -->
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
@@ -57,32 +57,32 @@
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
-        <!-- Actuator: infraestrutura de métricas + endpoints /actuator -->
+        <!-- Actuator: metrics infrastructure plus /actuator endpoints -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Conecta Micrometer/Observation ao OpenTelemetry (traces automáticos para HTTP, AMQP, etc.) -->
+        <!-- Connects Micrometer/Observation to OpenTelemetry (automatic traces for HTTP, AMQP, etc.) -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-tracing-bridge-otel</artifactId>
         </dependency>
 
-        <!-- Exporta traces via OTLP para o Tempo -->
+        <!-- Exports traces through OTLP to Tempo -->
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp</artifactId>
         </dependency>
 
-        <!-- Exporta métricas via OTLP para o Prometheus/Mimir -->
+        <!-- Exports metrics through OTLP to Prometheus/Mimir -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-otlp</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Intercepta logs do Logback e envia via OTLP para o Loki (com traceId/spanId automático) -->
+        <!-- Intercepts Logback logs and sends them through OTLP to Loki (with automatic traceId/spanId) -->
         <dependency>
             <groupId>io.opentelemetry.instrumentation</groupId>
             <artifactId>opentelemetry-logback-appender-1.0</artifactId>

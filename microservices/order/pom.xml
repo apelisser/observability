@@ -41,9 +41,9 @@
     <dependencyManagement>
         <dependencies>
             <!--
-                Gerencia as versões das libs do datasource-micrometer, que instrumenta o DataSource
-                via Micrometer Observation, gerando spans automáticos para cada operação SQL
-                (query, update, etc.) e tornando-os visíveis (ex.: no Grafana Tempo) como parte do trace distribuído.
+                Manages datasource-micrometer library versions. datasource-micrometer instruments the DataSource
+                through Micrometer Observation, creating automatic spans for each SQL operation
+                (query, update, etc.) and making them visible (for example, in Grafana Tempo) as part of the distributed trace.
             -->
             <dependency>
                 <groupId>net.ttddyy.observation</groupId>
@@ -54,10 +54,10 @@
             </dependency>
 
             <!--
-                Gerencia as versões de todas as libs de instrumentação do OpenTelemetry para Java,
-                garantindo compatibilidade entre elas. Complementa o BOM do Spring Boot, que já gerencia
-                o opentelemetry-sdk e o opentelemetry-exporter-otlp - este BOM cobre as libs de
-                instrumentação (ex: logback-appender) que não estão no BOM do Spring Boot.
+                Manages the versions of all OpenTelemetry Java instrumentation libraries,
+                ensuring compatibility between them. It complements the Spring Boot BOM, which already manages
+                opentelemetry-sdk and opentelemetry-exporter-otlp; this BOM covers instrumentation libraries
+                (for example, logback-appender) that are not managed by the Spring Boot BOM.
             -->
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>

@@ -33,10 +33,10 @@ public class RabbitMQConfig {
     }
 
     /**
-     * Customiza o RabbitTemplate com suporte a propagação de trace (observation-enabled).
-     * ATENÇÃO: este bean ignora as configurações definidas em application.properties/yaml
-     * (spring.rabbitmq.template.*). Qualquer propriedade necessária deve ser configurada
-     * explicitamente aqui. Prefira usar RabbitTemplateConfigurer para herdar as configs do Spring Boot.
+     * Customizes RabbitTemplate with trace propagation support (observation-enabled).
+     * WARNING: this bean ignores settings defined in application.properties/yaml
+     * (spring.rabbitmq.template.*). Any required property must be configured
+     * explicitly here. Prefer RabbitTemplateConfigurer to inherit Spring Boot settings.
      */
     @Bean
     public RabbitTemplate rabbitTemplateManual(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
@@ -47,10 +47,10 @@ public class RabbitMQConfig {
     }
 
     /**
-     * Customiza o RabbitTemplate mantendo todas as configurações definidas em application.properties/yaml
-     * (ex: spring.rabbitmq.template.*), incluindo observation-enabled para propagação de trace.
-     * O uso do RabbitTemplateConfigurer garante que as propriedades do Spring Boot sejam aplicadas
-     * antes das customizações adicionais deste bean.
+     * Customizes RabbitTemplate while preserving all settings defined in application.properties/yaml
+     * (for example, spring.rabbitmq.template.*), including observation-enabled for trace propagation.
+     * Using RabbitTemplateConfigurer guarantees that Spring Boot properties are applied
+     * before this bean's additional customizations.
      */
     @Bean
     @Primary

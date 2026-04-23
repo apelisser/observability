@@ -58,7 +58,7 @@
 			<optional>true</optional>
 		</dependency>
 
-        <!-- Extending instrumentations with the API-->
+        <!-- Extends instrumentation with the OpenTelemetry API -->
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-api</artifactId>

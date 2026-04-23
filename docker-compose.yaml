@@ -36,7 +36,7 @@ services:
         wait
       "
 
-  # Instrumentado via OpenTelemetry Java Agent (zero-code), sem dependências de observabilidade no projeto
+  # Instrumented through OpenTelemetry Java Agent (zero-code), with no observability dependencies in the project
   product-service:
     build:
       context: microservices/product
@@ -55,7 +55,7 @@ services:
       grafana-lgtm:
         condition: service_healthy
 
-  # Starter do OpenTelemetry (publicado pelo projeto OTel) para auto-instrumentação de Spring Boot
+  # OpenTelemetry Starter (published by the OTel project) for Spring Boot auto-instrumentation
   payment-service:
     build:
       context: microservices/payment
@@ -70,7 +70,7 @@ services:
       grafana-lgtm:
         condition: service_healthy
 
-  # Observabilidade via Micrometer Tracing com bridge OTel (zero-agent, zero-starter)
+  # Observability through Micrometer Tracing with the OTel bridge (zero-agent, zero-starter)
   notification-service:
     build:
       context: microservices/notification
@@ -88,7 +88,7 @@ services:
       grafana-lgtm:
         condition: service_healthy
 
-  # Starter nativo do Spring Boot 4.x para OpenTelemetry
+  # Native Spring Boot 4.x starter for OpenTelemetry
   order-service:
     build:
       context: microservices/order

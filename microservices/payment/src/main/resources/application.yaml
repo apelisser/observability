@@ -1,24 +1,23 @@
 server.port: 8082
 spring.application.name: payment-service
 
-# Defina a taxa de sucesso dos pagamentos processados.
-# Valores válidos: 0 a 100.
-# 0 significa que todos os pagamentos falharão.
-# 100 significa que todos os pagamentos serão processados com sucesso.
-# Um valor em (0, 100) simula uma taxa de sucesso aleatória.
-# Por exemplo, 70 simula uma taxa de sucesso de 70%.
-# Obs: o valor é calculado aleatoriamente antes de cada pagamento.
+# Defines the success rate for processed payments.
+# Valid values: 0 to 100.
+# 0 means all payments will fail.
+# 100 means all payments will be processed successfully.
+# A value in (0, 100) simulates a random success rate.
+# For example, 70 simulates a 70% success rate.
+# Note: the value is evaluated randomly before each payment.
 payment.success.rate: ${PAYMENT_SUCCESS_RATE:99}
 
 otel:
   service.name: payment-service
   exporter.otlp.endpoint: http://localhost:4318
 
-# Configuração de logging para adicionar os IDs de rastreamento e span nos logs.
-# Isso é útil para correlacionar os logs em diferentes serviços.
-# Obs: essa configuração não é definida no arquivo de configuração padrão do Spring
-#      (spring-boot-starter-logging), mas sim no arquivo de configuração padrão do
-#      Micrometer (micrometer-core). O Micrometer é uma biblioteca que suporta
-#      métricas, rastreamento e registro em log de aplicações Java.
+# Logging configuration that adds trace and span IDs to logs.
+# This is useful for correlating logs across services.
+# Note: this setting is not defined by the default Spring logging configuration
+#      (spring-boot-starter-logging), but by Micrometer's default configuration
+#      (micrometer-core). Micrometer supports metrics, tracing, and logging for Java applications.
 #      (https://micrometer.io/)
 logging.pattern.correlation: '[%32X{trace_id}-%16X{span_id}] '
