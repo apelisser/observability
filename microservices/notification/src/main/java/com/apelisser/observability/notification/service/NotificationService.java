@@ -12,13 +12,7 @@ public class NotificationService {
     public void sendNotification(String message, String channel) {
         log.info("Sending notification | channel={}, message={}", channel, message);
 
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.warn("Notification interrupted");
-            return;
-        }
+        // Send notification process...
 
         log.info("Notification sent");
     }
