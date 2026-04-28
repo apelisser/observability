@@ -1,6 +1,5 @@
 package com.apelisser.observability.order.service;
 
-import com.apelisser.observability.order.core.rabbitmq.RabbitMQConfig;
 import com.apelisser.observability.order.model.Notification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -26,17 +25,8 @@ public class NotificationService {
 
     public void notify(Notification notification) {
         log.info("Sending notification: {}", notification);
-        String routingKey = getRoutingKey(notification);
-        setNotification(routingKey, notification);
-    }
-
-    private void setNotification(String routingKey, Notification notification) {
-        rabbitTemplate.convertAndSend(EXCHANGE, routingKey, notification);
-    }
-
-    private String getRoutingKey(Notification notification) {
-        int routingKey = ThreadLocalRandom.current().nextInt(0, ROUTING_KEYS.size());
-        return ROUTING_KEYS.get(routingKey);
+        String routingKey = getRandomRoutingKey();
+        sendNotification(routingKey, notification);
     }
 
     @Async
@@ -46,10 +36,9 @@ public class NotificationService {
             limit.acquire();
             acquired = true;
 
-            // TODO
             log.info("Sending async notification: {}", notification);
-            String routingKey = getRoutingKey(notification);
-            setNotification(routingKey, notification);
+            String routingKey = getRandomRoutingKey();
+            sendNotification(routingKey, notification);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("Interrupted while waiting for notification", e);
@@ -58,6 +47,15 @@ public class NotificationService {
                 limit.release();
             }
         }
+    }
+
+    private void sendNotification(String routingKey, Notification notification) {
+        rabbitTemplate.convertAndSend(EXCHANGE, routingKey, notification);
+    }
+
+    private String getRandomRoutingKey() {
+        int randomIndex = ThreadLocalRandom.current().nextInt(0, ROUTING_KEYS.size());
+        return ROUTING_KEYS.get(randomIndex);
     }
 
 }

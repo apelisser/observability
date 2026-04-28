@@ -1,5 +1,6 @@
 package com.apelisser.observability.order.service;
 
+import com.apelisser.observability.order.model.Reservation;
 import com.apelisser.observability.order.model.ReservationResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -22,7 +23,7 @@ public class ProductService {
         ReservationResult result = productClient.post()
             .uri("/products/{productId}/reservations", productId)
             .contentType(MediaType.APPLICATION_JSON)
-            .body("{\"quantity\": \"" + quantity + "\"}")
+            .body(Reservation.of(quantity))
             .retrieve()
             .body(ReservationResult.class);
 
