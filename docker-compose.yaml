@@ -43,6 +43,8 @@ services:
       dockerfile: Dockerfile
     image: product-service:local
     container_name: product-service
+    ports:
+      - "8081:8081"
     environment:
       JAVA_TOOL_OPTIONS: -javaagent:/opt/otel/opentelemetry-javaagent.jar
       OTEL_SERVICE_NAME: product-service
@@ -62,6 +64,8 @@ services:
       dockerfile: Dockerfile
     image: payment-service:local
     container_name: payment-service
+    ports:
+      - "8082:8082"
     environment:
       PAYMENT_SUCCESS_RATE: 70
       OTEL_EXPORTER_OTLP_ENDPOINT: http://grafana-lgtm:4318
